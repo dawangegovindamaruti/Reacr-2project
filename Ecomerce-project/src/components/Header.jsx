@@ -8,7 +8,7 @@ import { Link } from 'react-router';
   cart.forEach(cartItem => {
      totalquantity += cartItem.quantity;
   });
-  return (<>
+  return (
 
     <div className="amazon-header">
       <div className="amazon-header-left-section">
@@ -42,5 +42,5 @@ import { Link } from 'react-router';
       </div>
     </div>
 
-  </>)
+  )
 }
