@@ -1,10 +1,15 @@
 import { Header } from '../components/Header';
 import './HomePage.css';
-import products from './starting-code/backend'
 
 
  export function HomePage(){
-  
+   
+  fetch('http://localhost:3000/api/products')
+     .then((response) =>{
+      console.log(response);
+     })
+
+
 
   return ( 
     <>
