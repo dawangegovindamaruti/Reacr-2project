@@ -24,6 +24,8 @@ import './HomePage.css';
     <>
     <title>Ecomerce project</title>
     <Header cart={cart}/>
+
+    
     <div className="main">
       <div className="products-grid">
         {products.map((product) =>{

@@ -1,11 +1,10 @@
 import './header.css';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
  export function Header({cart}) {
-
   let totalquantity = 0;
 
-  cart.forEach(cartItem => {
+  cart.forEach((cartItem) => {
      totalquantity += cartItem.quantity;
   });
   return (
@@ -14,9 +13,9 @@ import { Link } from 'react-router';
       <div className="amazon-header-left-section">
         <Link to="/" className="header-link">
           <img className="amazon-logo"
-            src="images/amazon-logo-white.png" />
+            src="/images/amazon-logo-white.png"  alt="Amazon Logo" />
           <img className="amazon-mobile-logo"
-            src="images/amazon-mobile-logo-white.png" />
+            src="/images/amazon-mobile-logo-white.png" alt="Amazon Mobile Logo"/>
         </Link>
       </div>
 

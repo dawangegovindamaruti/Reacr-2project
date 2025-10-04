@@ -9,7 +9,7 @@ import { useEffect ,useState} from 'react'
 
 function App() {
 
-     const [cart,setCart] = useState([]);
+     const [cart, setCart] = useState([]);
 
      useEffect(() =>{
           axios.get('/api/cart-items?expand=product')
@@ -24,8 +24,8 @@ function App() {
     <Routes>
     <Route index element={<HomePage cart={cart} />}/>
     <Route path="checkout" element={< CheckoutPage cart={cart} />}/>
-    <Route path="orders" element={<OrderPage/>}></Route>
-     <Route path="tracking" element={<TrackingPage/>}/>
+    <Route path="orders" element={<OrderPage  cart={cart}/>}></Route>
+     <Route path="tracking" element={<TrackingPage cart={cart}/>}/>
     </Routes>
     
     </>
