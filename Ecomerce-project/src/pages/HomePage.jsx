@@ -9,7 +9,7 @@ import './HomePage.css';
     <>
     <div className="amazon-header">
       <div className="amazon-header-left-section">
-        <a href="amazon.html" className="header-link">
+        <a href="/" className="header-link">
           <img className="amazon-logo"
             src="images/amazon-logo-white.png"/>
           <img className="amazon-mobile-logo"
@@ -26,12 +26,12 @@ import './HomePage.css';
       </div>
 
       <div className="amazon-header-right-section">
-        <a className="orders-link header-link" href="orders.html">
+        <a className="orders-link header-link" href="/orders">
           <span className="returns-text">Returns</span>
           <span className="orders-text">& Orders</span>
         </a>
 
-        <a className="cart-link header-link" href="checkout.html">
+        <a className="cart-link header-link" href="/checkout">
           <img className="cart-icon" src="images/icons/cart-icon.png"/>
           <div className="cart-quantity">3</div>
           <div className="cart-text">Cart</div>
