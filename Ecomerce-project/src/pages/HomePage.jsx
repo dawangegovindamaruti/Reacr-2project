@@ -1,28 +1,34 @@
 import axios from 'axios';
+import { useEffect,useState } from 'react';
 import { Header } from '../components/Header';
 import './HomePage.css';
 
 
  export function HomePage(){
    
-  axios.get('http://localhost:3000/api/products')
+   const [products, setProducts] = useState([]);
+  useEffect(() =>{
+           axios.get('http://localhost:3000/api/products')
      .then((response) =>{
-      console.log(response.data);
-     }).
+      setProducts(response.data);
+     });
+  }, []);
+
 
 
 
   return ( 
     <>
-   
+    <title>Ecomerce project</title>
     <Header/>
     <div className="main">
       <div className="products-grid">
         {products.map((product) =>{
-               <div className="product-container">
+          return(
+          <div key={product.id} className="product-container">
           <div className="product-image-container">
             <img className="product-image"
-              src={product.image}/>
+               src={product.image} />
           </div>
 
           <div className="product-name limit-text-to-2-lines">
@@ -31,14 +37,14 @@ import './HomePage.css';
 
           <div className="product-rating-container">
             <img className="product-rating-stars"
-              src={`images/ratings/rating-${product.rating-stars * 10}.png`}/>
+              src={`images/ratings/rating-${product.rating.stars * 10}.png`}/>
             <div className="product-rating-count link-primary">
               {product.rating.count}
             </div>
           </div>
 
           <div className="product-price">
-          ${(product.priceCent / 100).toFixed(2)}
+          ${(product.priceCents / 100).toFixed(2)}
           </div>
 
           <div className="product-quantity-container">
@@ -67,9 +73,10 @@ import './HomePage.css';
             Add to Cart
           </button>
         </div>
+          )
         })}
        
-
+      
      
       </div>
     </div>
