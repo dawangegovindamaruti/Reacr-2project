@@ -34,7 +34,7 @@
 
 @media (max-width: 1000px) {
   .main {
-    max-width: 500px;
+    max-width: 600px;
   }
 
   .checkout-grid {
@@ -47,6 +47,7 @@
   border: 1px solid rgb(222, 222, 222);
   border-radius: 4px;
   padding: 18px;
+  
 }
 
 .cart-item-container {
@@ -82,12 +83,12 @@
      take up half the remaining space in the grid
      (they will divide up the remaining space evenly). */
   grid-template-columns: 100px 1fr 1fr;
-  column-gap: 25px;
+  column-gap: 40px;
 }
 
 @media (max-width: 1000px) {
   .cart-item-details-grid {
-    grid-template-columns: 100px 1fr;
+    grid-template-columns: 10px 1fr;
     row-gap: 30px;
   }
 }
@@ -106,13 +107,14 @@
 
 .product-name {
   font-weight: 700;
-  margin-bottom: 8px;
+  margin-bottom: 20px;
 }
 
 .product-price {
   color: rgb(177, 39, 4);
   font-weight: 700;
   margin-bottom: 5px;
+  margin-top: 30px;
 }
 
 .product-quantity .link-primary {
@@ -130,7 +132,7 @@
        / span 2 means this element will take up 2 columns
        in the grid (Normally, each element takes up 1
        column in the grid). */
-    grid-column: 1 / span 2;
+    grid-column: 1 /span 2;
   }
 }
 

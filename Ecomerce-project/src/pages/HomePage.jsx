@@ -10,13 +10,11 @@ import './HomePage.css';
    const [products, setProducts] = useState([]);
   
   useEffect(() =>{
-           axios.get('/api/products')
+       axios.get('/api/products')
      .then((response) =>{
       setProducts(response.data);
      });
 
-      
-     
   }, []);
 
 
@@ -25,7 +23,7 @@ import './HomePage.css';
     <title>Ecomerce project</title>
     <Header cart={cart}/>
 
-    
+
     <div className="main">
       <div className="products-grid">
         {products.map((product) =>{

@@ -1,4 +1,4 @@
 
- export function formatemoney(){
-  `${(CSSMathProduct.priceCents/ 100).toFixed(2)}`;
+ export function formatemoney(amountCents){
+   return `${(amountCents/ 100).toFixed(2)}`;
 }

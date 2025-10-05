@@ -29,8 +29,8 @@ useEffect(() =>{
       <div className="header-content">
         <div className="checkout-header-left-section">
           <a href="/">
-            <img className="amazon-logo" src="images/amazon-logo.png"/>
-            <img className="amazon-mobile-logo" src="images/amazon-mobile-logo.png"/>
+            <img className="amazon-logo" src="/public/images/amazon-logo.png"/>
+            <img className="amazon-mobile-logo" src="/public/images/amazon-mobile-logo.png"/>
           </a>
         </div>
 
@@ -40,7 +40,7 @@ useEffect(() =>{
         </div>
 
         <div className="checkout-header-right-section">
-          <img src="images/icons/checkout-lock-icon.png"/>
+          <img src="/public/images/icons/checkout-lock-icon.png"/>
         </div>
       </div>
     </div>
@@ -51,7 +51,7 @@ useEffect(() =>{
       <div className="checkout-grid">
         <div className="order-summary">
          
-          { deliveryOptions.length > 0 &&cart.map((cartItem) =>{
+          { deliveryOptions.length > 0 && cart.map((cartItem) =>{
 
            const selectDeliveryOption = deliveryOptions
            .find((deliveryOption)=>{
@@ -60,7 +60,7 @@ useEffect(() =>{
 
 
             return(
-              <div  key={cartItem.productId}className="cart-item-container">
+              <div  key={cartItem.productId} className="cart-item-container">
             <div className="delivery-date">
               Delivery date:{dayjs(selectDeliveryOption.estimatedDeliveryTimeMs).format('dddd, MMMM, D')};
             </div>
@@ -103,14 +103,14 @@ useEffect(() =>{
                  let priceString = 'FREE Shipping';
 
                   if(deliveryOption.priceCents > 0){
-                    priceString = `${formatemoney(deliveryOption.priceCents)} - shipping`
+                    priceString = `${formatemoney(deliveryOption.priceCents)} - shipping`;
                   }
                   return(
                            
                
                    <div key={deliveryOption.id}className="delivery-option">
                   <input type="radio" 
-                  checked={deliveryOption.id ===cartItem.deliveryOptionId}
+                  checked={deliveryOption.id === cartItem.deliveryOptionId}
                     className="delivery-option-input"
                     name={`delivery-option-${cartItem.productId}`}/>
                   <div>
@@ -123,7 +123,7 @@ useEffect(() =>{
                     </div>
                   </div>
                 </div>
-                  )
+                  );
                 })}
                 
               </div>
