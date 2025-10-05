@@ -2,13 +2,12 @@
  import dayjs from "dayjs";
 import { DeliveryOption } from "./DeliveryOptions";
 
-export function OrderSummary({cart, deliveryOptions}){
+export function OrderSummary({cart, deliveryOptions,loadCart}){
    
   return (
      <div className="order-summary">
              
               { deliveryOptions.length > 0 && cart.map((cartItem) =>{
-    
                const selectDeliveryOption = deliveryOptions
                .find((deliveryOption)=>{
                 return deliveryOption.id === cartItem.deliveryOptionId;
@@ -47,7 +46,8 @@ export function OrderSummary({cart, deliveryOptions}){
                     </div>
                   </div>
     
-                   <DeliveryOption cartItem={cartItem} deliveryOptions={deliveryOptions}/>
+                   <DeliveryOption cartItem={cartItem} deliveryOptions={deliveryOptions}
+                    loadCart={loadCart}/>
                 </div>
               </div>
                 )
