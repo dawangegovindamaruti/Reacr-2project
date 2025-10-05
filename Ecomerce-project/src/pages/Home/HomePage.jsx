@@ -5,7 +5,7 @@ import { ProductGrid } from './ProductGrid';
 import './HomePage.css';
 
 
- export function HomePage({ cart }){
+ export function HomePage({ cart, loadCart }){
    
    const [products, setProducts] = useState([]);
   
@@ -26,7 +26,7 @@ import './HomePage.css';
 
 
     <div className="main">
-      <ProductGrid products={products}/>
+      <ProductGrid products={products} loadCart={loadCart}/>
     </div>
     </>
     );
