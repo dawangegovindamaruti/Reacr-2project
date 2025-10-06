@@ -13,7 +13,7 @@ import './HomePage.css';
     const getHomeData = async () =>{
         const response =  await axios.get('/api/products')
         setProducts(response.data);
-    };
+    }
       
     getHomeData();
   }, []);
@@ -29,5 +29,8 @@ import './HomePage.css';
       <ProductGrid products={products} loadCart={loadCart}/>
     </div>
     </>
+
+
+
     );
 }

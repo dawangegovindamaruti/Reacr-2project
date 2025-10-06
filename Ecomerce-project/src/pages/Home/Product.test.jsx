@@ -44,7 +44,7 @@ describe('product component', () =>{
      ).toBeInTheDocument();
   
     expect(
-    screen.getByTestId('product-image')
+      screen.getByTestId('product-image')
      ).toHaveAttribute('src', 'images/products/athletic-cotton-socks-6-pairs.jpg')
   
 
@@ -61,22 +61,21 @@ describe('product component', () =>{
      });
   
     it('adds a product to the cart', async () =>{
-         const product = 
-  
-    
-  render(<Product product={product} loadCart={loadCart}/>);
+      
+     render(<Product product={product} loadCart={loadCart}/>);
 
-   const user= userEvent.setup();
-   const addToCartButton =   screen.getByTestId('add-to-cart-button');
+     const user = userEvent.setup();
+     const addToCartButton = screen.getByTestId('add-to-cart-button');
      await user.click(addToCartButton);
 
      expect(axios.post).toHaveBeenCalledWith(
-         '/api/cart-items',
+         'api/cart-items',
          {
           productId : "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
-          quantity: 1,
+          quantity: 1
          }
-        );
+
+        ),
         expect(loadCart).toHaveBeenCalled();
   });
      
