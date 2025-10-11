@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "Ecomerce-project",
+			"path": "../../.."
+		},
+		{
+			"name": "ecomerce-backend",
+			"path": "../../../../../ecomerce-backend"
+		}
+	],
+	"settings": {}
+}
