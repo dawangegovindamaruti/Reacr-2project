@@ -13,7 +13,7 @@ describe('HomePage component', () => {
   beforeEach(() => {
     loadCart = vi.fn();
 
-    axios.get.mockResolvedValue(async (urlPath) => {
+    axios.get.mockImplementation(async (urlPath) => {
       if (urlPath === '/path/products')
         return {
           data: [{
