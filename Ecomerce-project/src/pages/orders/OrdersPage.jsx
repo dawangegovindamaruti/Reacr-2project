@@ -5,13 +5,15 @@ import { formatemoney } from '../../utils/money';
 import { Header } from '../../components/Header';
 import './OrderPage.css'
 
-export function OrderPage({ cart }) {
+export function OrderPage({ cart, loadCart }) {
 
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [cancellingOrderId, setCancellingOrderId] = useState(null);
-  const [selectedOrderId, setSelectedOrderId] = useState(null);
+  const [deletingOrderId, setDeletingOrderId] = useState(null);
+  const [deletingProductId, setDeletingProductId] = useState(null);
+  const [addingProductId, setAddingProductId] = useState(null);
 
   const loadOrders = async () => {
     try {
@@ -21,7 +23,9 @@ export function OrderPage({ cart }) {
       setOrders(response.data);
     } catch (err) {
       console.error('Error fetching orders:', err);
-      setError('Failed to load orders. Please try again.');
+      setError(err.response?.status === 401
+        ? 'Please sign in to view your orders.'
+        : 'Failed to load orders. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -40,7 +44,7 @@ export function OrderPage({ cart }) {
     try {
       setCancellingOrderId(orderId);
       await axios.put(`/api/orders/${orderId}/cancel`);
-      setOrders(orders.map(order => 
+      setOrders(currentOrders => currentOrders.map(order => 
         order._id === orderId 
           ? { ...order, status: 'cancelled' }
           : order
@@ -59,11 +63,88 @@ export function OrderPage({ cart }) {
     try {
       const response = await axios.get(`/api/orders/${orderId}?expand=products`);
       console.log('Order Details:', response.data);
-      setSelectedOrderId(orderId);
       alert(`Order ID: ${response.data._id}\nTotal: ${formatemoney(response.data.totalCostCents)}\nItems: ${response.data.products.length}`);
     } catch (err) {
       console.error('Error fetching order details:', err);
       alert('Failed to load order details');
+    }
+  };
+
+  const handleDeleteOrder = async (orderId) => {
+    if (!window.confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setDeletingOrderId(orderId);
+      await axios.delete(`/api/orders/${orderId}`);
+      setOrders(currentOrders => currentOrders.filter(order => order._id !== orderId));
+      alert('Order deleted successfully');
+    } catch (err) {
+      console.error('Error deleting order:', err);
+      alert('Failed to delete order');
+    } finally {
+      setDeletingOrderId(null);
+    }
+  };
+
+  const handleBuyAgain = async (orderProduct) => {
+    const productId = orderProduct.product?._id || orderProduct.productId;
+
+    try {
+      setAddingProductId(productId);
+      await axios.post('/api/cart-items', {
+        productId,
+        quantity: orderProduct.quantity
+      });
+      await loadCart();
+      alert('Product added to cart');
+    } catch (err) {
+      console.error('Error adding product to cart:', err);
+      alert('Failed to add product to cart');
+    } finally {
+      setAddingProductId(null);
+    }
+  };
+
+  const handleDeleteProduct = async (orderId, orderProduct) => {
+    const productId = orderProduct.product?._id || orderProduct.productId;
+    if (!window.confirm('Remove this product from the order?')) {
+      return;
+    }
+
+    try {
+      setDeletingProductId(`${orderId}-${productId}`);
+      const response = await axios.delete(`/api/orders/${orderId}/products/${productId}`);
+      setOrders(currentOrders => currentOrders.flatMap(order => {
+        if (order._id !== orderId) {
+          return [order];
+        }
+
+        if (response.data.orderDeleted) {
+          return [];
+        }
+
+        return {
+          ...order,
+          products: order.products.filter(product => (
+            (product.product?._id || product.productId) !== productId
+          )),
+          totalCostCents: Math.round(
+            order.products
+              .filter(product => (product.product?._id || product.productId) !== productId)
+              .reduce((total, product) => (
+                total + (product.product?.priceCents || 0) * product.quantity
+              ), 0) * 1.1
+          )
+        };
+      }));
+      alert('Product removed from order');
+    } catch (err) {
+      console.error('Error deleting product from order:', err);
+      alert('Failed to remove product from order');
+    } finally {
+      setDeletingProductId(null);
     }
   };
 
@@ -186,7 +267,7 @@ export function OrderPage({ cart }) {
                 <div className="order-details-grid">
                   {order.products.map((orderproduct) => {
                     return (
-                      <Fragment key={orderproduct.product._id}>
+                      <Fragment key={orderproduct.product?._id || orderproduct.productId}>
                         <div className="product-image-container">
                           <img src={orderproduct.product.image} />
                         </div>
@@ -201,9 +282,36 @@ export function OrderPage({ cart }) {
                           <div className="product-quantity">
                             Quantity: {orderproduct.quantity}
                           </div>
-                          <button className="buy-again-button button-primary">
+                          <button
+                            className="buy-again-button button-primary"
+                            onClick={() => handleBuyAgain(orderproduct)}
+                            disabled={addingProductId === (orderproduct.product?._id || orderproduct.productId)}
+                          >
                             <img className="buy-again-icon" src="images/icons/buy-again.png" />
-                            <span className="buy-again-message">Buy it again</span>
+                            <span className="buy-again-message">
+                              {addingProductId === (orderproduct.product?._id || orderproduct.productId)
+                                ? 'Adding...'
+                                : 'Buy it again'}
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleDeleteProduct(order._id, orderproduct)}
+                            disabled={deletingProductId === `${order._id}-${orderproduct.product?._id || orderproduct.productId}`}
+                            style={{
+                              marginTop: '8px',
+                              padding: '7px 10px',
+                              backgroundColor: '#6c757d',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              cursor: 'pointer',
+                              fontSize: '12px'
+                            }}
+                          >
+                            {deletingProductId === `${order._id}-${orderproduct.product?._id || orderproduct.productId}`
+                              ? 'Removing...'
+                              : 'Remove Product'}
                           </button>
                         </div>
 
@@ -264,6 +372,22 @@ export function OrderPage({ cart }) {
                       {cancellingOrderId === order._id ? 'Cancelling...' : 'Cancel Order'}
                     </button>
                   )}
+
+                  <button
+                    onClick={() => handleDeleteOrder(order._id)}
+                    disabled={deletingOrderId === order._id}
+                    style={{
+                      padding: '8px 12px',
+                      backgroundColor: deletingOrderId === order._id ? '#ccc' : '#6c757d',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: deletingOrderId === order._id ? 'not-allowed' : 'pointer',
+                      fontSize: '12px'
+                    }}
+                  >
+                    {deletingOrderId === order._id ? 'Deleting...' : 'Delete Order'}
+                  </button>
                 </div>
 
               </div>

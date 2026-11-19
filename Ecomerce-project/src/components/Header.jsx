@@ -13,9 +13,9 @@ import { Link } from 'react-router-dom';
       <div className="amazon-header-left-section">
         <Link to="/" className="header-link">
           <img className="amazon-logo"
-            src="/public/images/amazon-logo-white.png"  alt="Amazon Logo" />
+            src="/images/amazon-logo-white.png"  alt="Amazon Logo" />
            <img className="amazon-mobile-logo"
-            src="/public/images/amazon-mobile-logo-white.png" alt="Amazon Mobile Logo"/>
+            src="/images/amazon-mobile-logo-white.png" alt="Amazon Mobile Logo"/>
         </Link>
       </div>
 
