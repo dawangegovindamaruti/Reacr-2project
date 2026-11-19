@@ -8,90 +8,270 @@ import './OrderPage.css'
 export function OrderPage({ cart }) {
 
   const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [cancellingOrderId, setCancellingOrderId] = useState(null);
+  const [selectedOrderId, setSelectedOrderId] = useState(null);
+
+  const loadOrders = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await axios.get('/api/orders?expand=products');
+      setOrders(response.data);
+    } catch (err) {
+      console.error('Error fetching orders:', err);
+      setError('Failed to load orders. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    axios.get('/api/orders?expand=products')
-      .then((response) => {
-        setOrders(response.data);
-      });
+    loadOrders();
   }, []);
 
+  // CANCEL ORDER
+  const handleCancelOrder = async (orderId) => {
+    if (!window.confirm('Are you sure you want to cancel this order?')) {
+      return;
+    }
 
-  return (<>
-    <title >order page</title>
-    <Header cart={cart} />
+    try {
+      setCancellingOrderId(orderId);
+      await axios.put(`/api/orders/${orderId}/cancel`);
+      setOrders(orders.map(order => 
+        order._id === orderId 
+          ? { ...order, status: 'cancelled' }
+          : order
+      ));
+      alert('Order cancelled successfully');
+    } catch (err) {
+      console.error('Error cancelling order:', err);
+      alert('Failed to cancel order');
+    } finally {
+      setCancellingOrderId(null);
+    }
+  };
 
-    <div className="main">
-      <div className="page-title">Your Orders</div>
+  // VIEW ORDER DETAILS
+  const handleViewOrderDetails = async (orderId) => {
+    try {
+      const response = await axios.get(`/api/orders/${orderId}?expand=products`);
+      console.log('Order Details:', response.data);
+      setSelectedOrderId(orderId);
+      alert(`Order ID: ${response.data._id}\nTotal: ${formatemoney(response.data.totalCostCents)}\nItems: ${response.data.products.length}`);
+    } catch (err) {
+      console.error('Error fetching order details:', err);
+      alert('Failed to load order details');
+    }
+  };
 
-      <div className="orders-grid">
-        {orders.map((order) => {
-          return (
-            <div key={order.id} className="order-container">
+  // LOADING STATE
+  if (loading) {
+    return (
+      <>
+        <Header cart={cart} />
+        <div className="main">
+          <div className="page-title">Your Orders</div>
+          <div style={{ textAlign: 'center', padding: '40px', fontSize: '18px', color: '#666' }}>
+            <p>Loading your orders...</p>
+          </div>
+        </div>
+      </>
+    );
+  }
 
-              <div className="order-header">
-                <div className="order-header-left-section">
-                  <div className="order-date">
-                    <div className="order-header-label">Order Placed:</div>
-                    <div>{dayjs(order.orderTimeMs).format('MMMM D')}</div>
+  // ERROR STATE
+  if (error) {
+    return (
+      <>
+        <Header cart={cart} />
+        <div className="main">
+          <div className="page-title">Your Orders</div>
+          <div style={{ 
+            textAlign: 'center', 
+            padding: '40px',
+            backgroundColor: '#f8d7da',
+            border: '1px solid #f5c6cb',
+            borderRadius: '4px',
+            color: '#721c24',
+            margin: '20px'
+          }}>
+            <p>{error}</p>
+            <button 
+              onClick={loadOrders}
+              style={{
+                padding: '10px 20px',
+                marginTop: '10px',
+                backgroundColor: '#007bff',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer'
+              }}
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // EMPTY STATE
+  if (orders.length === 0) {
+    return (
+      <>
+        <Header cart={cart} />
+        <div className="main">
+          <div className="page-title">Your Orders</div>
+          <div style={{ textAlign: 'center', padding: '40px', fontSize: '18px', color: '#999' }}>
+            <p>📦 No orders yet.</p>
+            <a href="/" style={{ color: '#007bff', textDecoration: 'none' }}>
+              Start shopping →
+            </a>
+          </div>
+        </div>
+      </>
+    );
+  }
+
+  // MAIN CONTENT
+  return (
+    <>
+      <title>order page</title>
+      <Header cart={cart} />
+
+      <div className="main">
+        <div className="page-title">Your Orders ({orders.length})</div>
+
+        <div className="orders-grid">
+          {orders.map((order) => {
+            const isCancelled = order.status === 'cancelled';
+            return (
+              <div key={order._id} className="order-container" style={{
+                opacity: isCancelled ? 0.6 : 1,
+                borderLeft: isCancelled ? '4px solid #dc3545' : '4px solid #007bff'
+              }}>
+
+                <div className="order-header">
+                  <div className="order-header-left-section">
+                    <div className="order-date">
+                      <div className="order-header-label">Order Placed:</div>
+                      <div>{dayjs(order.orderTimeMs).format('MMMM D')}</div>
+                    </div>
+                    <div className="order-total">
+                      <div className="order-header-label">Total:</div>
+                      <div>{formatemoney(order.totalCostCents)}</div>
+                    </div>
                   </div>
-                  <div className="order-total">
-                    <div className="order-header-label">Total:</div>
-                    <div>{formatemoney(order.totalCostCents)}</div>
+
+                  <div className="order-header-right-section">
+                    <div className="order-header-label">Order ID:</div>
+                    <div>{order._id}</div>
+                    {isCancelled && (
+                      <div style={{
+                        color: '#dc3545',
+                        fontWeight: 'bold',
+                        marginTop: '8px',
+                        fontSize: '12px'
+                      }}>
+                        ❌ CANCELLED
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                <div className="order-header-right-section">
-                  <div className="order-header-label">Order ID:</div>
-                  <div>{order.id}</div>
-                </div>
-              </div>
-
-              <div className="order-details-grid">
-                {order.products.map((orderproduct) => {
-                  return (
-                    <Fragment key={orderproduct.product.id}>
-                      <div className="product-image-container">
-                        <img src={orderproduct.product.image} />
-                      </div>
-
-                      <div className="product-details">
-                        <div className="product-name">
-                          {orderproduct.product.name}
+                <div className="order-details-grid">
+                  {order.products.map((orderproduct) => {
+                    return (
+                      <Fragment key={orderproduct.product._id}>
+                        <div className="product-image-container">
+                          <img src={orderproduct.product.image} />
                         </div>
-                        <div className="product-delivery-date">
-                          Arriving on: {dayjs(orderproduct.estimatedDeliveryTimeMs).format('MMMM D')}
-                        </div>
-                        <div className="product-quantity">
-                          Quantity: {orderproduct.quantity}
-                        </div>
-                        <button className="buy-again-button button-primary">
-                          <img className="buy-again-icon" src="images/icons/buy-again.png" />
-                          <span className="buy-again-message">Buy it again</span>
-                        </button>
-                      </div>
 
-                      <div className="product-actions">
-                        <a href="/tracking">
-                          <button className="track-package-button button-secondary">
-                            Track package
+                        <div className="product-details">
+                          <div className="product-name">
+                            {orderproduct.product.name}
+                          </div>
+                          <div className="product-delivery-date">
+                            Arriving on: {dayjs(orderproduct.estimatedDeliveryTimeMs).format('MMMM D')}
+                          </div>
+                          <div className="product-quantity">
+                            Quantity: {orderproduct.quantity}
+                          </div>
+                          <button className="buy-again-button button-primary">
+                            <img className="buy-again-icon" src="images/icons/buy-again.png" />
+                            <span className="buy-again-message">Buy it again</span>
                           </button>
-                        </a>
-                      </div>
+                        </div>
 
+                        <div className="product-actions">
+                          {!isCancelled && (
+                            <a href="/tracking">
+                              <button className="track-package-button button-secondary">
+                                Track package
+                              </button>
+                            </a>
+                          )}
+                        </div>
 
-                    </Fragment>);
-                })}
+                      </Fragment>
+                    );
+                  })}
+
+                </div>
+
+                {/* ORDER ACTIONS */}
+                <div style={{
+                  display: 'flex',
+                  gap: '10px',
+                  marginTop: '15px',
+                  paddingTop: '15px',
+                  borderTop: '1px solid #ddd',
+                  justifyContent: 'flex-end'
+                }}>
+                  <button
+                    onClick={() => handleViewOrderDetails(order._id)}
+                    style={{
+                      padding: '8px 12px',
+                      backgroundColor: '#17a2b8',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px'
+                    }}
+                  >
+                    View Details
+                  </button>
+
+                  {!isCancelled && (
+                    <button
+                      onClick={() => handleCancelOrder(order._id)}
+                      disabled={cancellingOrderId === order._id}
+                      style={{
+                        padding: '8px 12px',
+                        backgroundColor: cancellingOrderId === order._id ? '#ccc' : '#dc3545',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '4px',
+                        cursor: cancellingOrderId === order._id ? 'not-allowed' : 'pointer',
+                        fontSize: '12px'
+                      }}
+                    >
+                      {cancellingOrderId === order._id ? 'Cancelling...' : 'Cancel Order'}
+                    </button>
+                  )}
+                </div>
 
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
 
-
-       
+        </div>
       </div>
-    </div>
-  </>
-  )
+    </>
+  );
 }

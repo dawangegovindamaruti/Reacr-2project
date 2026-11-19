@@ -7,8 +7,8 @@ export function Product( {product, loadCart}){
 
 
  const addToCart = async () => {
-               await  axios.post('api/cart-items',{
-                  productId : product.id,
+               await  axios.post('/api/cart-items',{
+                  productId : product._id,
                   quantity : quantity
                  });
                  await loadCart();
@@ -73,7 +73,7 @@ export function Product( {product, loadCart}){
           data-testid="add-to-cart-button"
             onClick={addToCart}>
             Add to Cart
-          </button>
+          </button> 
         </div>
   );
 }

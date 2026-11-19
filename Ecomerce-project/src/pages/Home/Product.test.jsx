@@ -3,7 +3,7 @@ import { render,screen } from '@testing-library/react';
 import { Product } from './product';
 import userEvent from '@testing-library/user-event';
 import axios from 'axios';
-
+// screen : check the fake web page
 vi.mock('axios');
 
 describe('product component', () =>{
@@ -20,13 +20,9 @@ describe('product component', () =>{
       count: 87
     },
     priceCents: 1090,
-    keywords: [
-      "socks",
-      "sports",
-      "apparel"
-    ]
+    keywords: ["socks","sports","apparel"]
   };
-     loadCart = vi.fn();
+     loadCart = vi.fn();   // vi.fn();   = create fake function
    
    })
 

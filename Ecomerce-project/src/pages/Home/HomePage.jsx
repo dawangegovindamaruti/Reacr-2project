@@ -13,6 +13,7 @@ import './HomePage.css';
     const getHomeData = async () =>{
         const response =  await axios.get('/api/products')
         setProducts(response.data);
+        console.log(response);
     }
       
     getHomeData();
